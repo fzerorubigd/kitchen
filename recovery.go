@@ -1,7 +1,8 @@
-package middleware
+package kitchen
 
 import (
 	"net/http"
+	"runtime/debug"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -12,9 +13,12 @@ import (
 func RecoveryMiddleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			if r := recover(); r != nil {
-				logrus.Warn(r)
+			if err := recover(); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				stack := debug.Stack()
+				f := "PANIC: %s\n%s"
+				logrus.Warn(f, err, string(stack))
 			}
 		}()
 

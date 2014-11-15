@@ -4,7 +4,11 @@
 // Data to handle
 package kitchen
 
-import "net/http"
+import (
+	"net/http"
+
+	"golang.org/x/net/context"
+)
 
 // A simple type, middlewares are like this
 type MiddlewareFunc func(http.Handler) http.Handler
@@ -14,10 +18,16 @@ type MiddlewareChain struct {
 	functions []MiddlewareFunc
 }
 
+// Create a middleware chain
+func NewMiddlewareChain(f ...MiddlewareFunc) MiddlewareChain {
+	return MiddlewareChain{f}
+}
+
 // A simple hack middleware to change the ResponseWriter type
 func responseWriterWrap(next http.Handler) http.Handler {
 	fn := func(rw http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(NewResponseWriter(rw), r)
+		ctx := context.TODO() // :)
+		next.ServeHTTP(NewResponseWriter(rw, ctx), r)
 	}
 
 	return http.HandlerFunc(fn)
@@ -45,4 +55,15 @@ func (mc MiddlewareChain) ThenFunc(fn http.HandlerFunc) http.Handler {
 	}
 
 	return mc.Then(http.HandlerFunc(fn))
+}
+
+// Append function to middleware chain and return NEW chain object
+// The old chain is usable after this.
+func (mc MiddlewareChain) Extend(f ...MiddlewareFunc) MiddlewareChain {
+	newFuncs := make([]MiddlewareFunc, len(mc.functions))
+	copy(newFuncs, mc.functions)
+	newFuncs = append(newFuncs, f...)
+
+	newChain := NewMiddlewareChain(newFuncs...)
+	return newChain
 }
