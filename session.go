@@ -9,9 +9,10 @@ import (
 	"golang.org/x/net/context"
 )
 
+// SessionContextKey is the key for session store in Context
 const SessionContextKey = "session"
 
-// Create new session midleware.
+// SessionMiddleware create new session midleware.
 // TODO : is this idiomatic :) to have 3 nested function like this?
 func SessionMiddleware(sess sessions.Store) MiddlewareFunc {
 	fn := func(next http.Handler) http.Handler {
@@ -31,9 +32,9 @@ func SessionMiddleware(sess sessions.Store) MiddlewareFunc {
 	return fn
 }
 
-// Get session from context. make sure the SessionMiddleware is there and you call this
+// GetSessionStore is for get session from context. make sure the SessionMiddleware is there and you call this
 // after session middleware in chain
-func GetSession(w http.ResponseWriter, r *http.Request) (sessions.Store, error) {
+func GetSessionStore(w http.ResponseWriter, r *http.Request) (sessions.Store, error) {
 	ctx, ok := w.(context.Context)
 	if !ok {
 		return nil, errors.New("the Context interface is not implemented")

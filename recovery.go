@@ -7,7 +7,7 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// A simple middleware for prevent program to panic in unhandled
+// RecoveryMiddleware is a simple middleware for prevent program to panic in unhandled
 // panic from other middleware or request
 // Must add this before any other middleware
 func RecoveryMiddleware(next http.Handler) http.Handler {

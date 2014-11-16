@@ -1,7 +1,3 @@
-// This is base on alice. I think alice is good but
-// whitout call(next(next(next))), I think this is not a good thing
-// to have this kind of chain. also the ResponseWriter need more extra
-// Data to handle
 package kitchen
 
 import (
@@ -10,15 +6,19 @@ import (
 	"golang.org/x/net/context"
 )
 
-// A simple type, middlewares are like this
+// MiddlewareFunc type, middlewares are like this
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// Chain structure for handling middleware
+// MiddlewareChain structure for handling middleware
+// This is base on alice. I think alice is good but
+// whitout call(next(next(next))), I think this is not a good thing
+// to have this kind of chain. also the ResponseWriter need more extra
+// Data to handle
 type MiddlewareChain struct {
 	functions []MiddlewareFunc
 }
 
-// Create a middleware chain
+// NewMiddlewareChain create new middleware base on functions
 func NewMiddlewareChain(f ...MiddlewareFunc) MiddlewareChain {
 	return MiddlewareChain{f}
 }
@@ -33,7 +33,7 @@ func responseWriterWrap(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-// Create the real http handler function.
+// Then Create the real http handler function.
 func (mc MiddlewareChain) Then(h http.Handler) http.Handler {
 	var final http.Handler
 	if h != nil {
@@ -48,7 +48,7 @@ func (mc MiddlewareChain) Then(h http.Handler) http.Handler {
 	return responseWriterWrap(final)
 }
 
-// Create the real http handler function.
+// ThenFunc Create the real http handler function.
 func (mc MiddlewareChain) ThenFunc(fn http.HandlerFunc) http.Handler {
 	if fn == nil {
 		return mc.Then(nil)
@@ -57,7 +57,7 @@ func (mc MiddlewareChain) ThenFunc(fn http.HandlerFunc) http.Handler {
 	return mc.Then(http.HandlerFunc(fn))
 }
 
-// Append function to middleware chain and return NEW chain object
+// Extend Append function to middleware chain and return NEW chain object
 // The old chain is usable after this.
 func (mc MiddlewareChain) Extend(f ...MiddlewareFunc) MiddlewareChain {
 	newFuncs := make([]MiddlewareFunc, len(mc.functions))

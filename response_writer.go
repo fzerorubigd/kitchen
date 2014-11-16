@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Much like negroni ResponseWriter interface.
+// ResponseWriter is much like negroni ResponseWriter interface.
 // But it also support context, using google context package, you can change the context,
 // normally with a child context with old context as its parent
 type ResponseWriter interface {
@@ -27,7 +27,7 @@ type ResponseWriter interface {
 	SetContext(context.Context)
 }
 
-// Create new response writer base on http response writer interface
+// NewResponseWriter Create new response writer base on http response writer interface
 // TODO : do i need to implement hijacker and flusher interface?
 func NewResponseWriter(rw http.ResponseWriter, ctx context.Context) ResponseWriter {
 	return &responseWriter{rw, ctx, sync.RWMutex{}, 0, 0}

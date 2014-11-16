@@ -7,6 +7,7 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
+// LoggerMiddleware is a simple middleware to handle logging with logrus
 func LoggerMiddleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -19,27 +20,16 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r) // Call the next one
 
 		latency := time.Since(start)
-		if res, ok := w.(ResponseWriter); ok {
-			logrus.WithFields(logrus.Fields{
-				"status":          res.Status(),
-				"method":          r.Method,
-				"request":         r.RequestURI,
-				"remote":          r.RemoteAddr,
-				"text_status":     http.StatusText(res.Status()),
-				"took":            latency,
-				"measure latency": latency.Nanoseconds(),
-			}).Info("completed handling request")
-		} else {
-			logrus.WithFields(logrus.Fields{
-				"status":           "NOT SUPPORT THE kitchen ",
-				"method":           r.Method,
-				"request":          r.RequestURI,
-				"remote":           r.RemoteAddr,
-				"text_status":      "NOT SUPPORT THE kitchen ",
-				"took":             latency,
-				"measure #latency": latency.Nanoseconds(),
-			}).Info("completed handling request")
-		}
+		res := w.(ResponseWriter)
+		logrus.WithFields(logrus.Fields{
+			"status":          res.Status(),
+			"method":          r.Method,
+			"request":         r.RequestURI,
+			"remote":          r.RemoteAddr,
+			"text_status":     http.StatusText(res.Status()),
+			"took":            latency,
+			"measure latency": latency.Nanoseconds(),
+		}).Info("completed handling request")
 	}
 	return http.HandlerFunc(fn)
 }
