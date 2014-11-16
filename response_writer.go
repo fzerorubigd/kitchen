@@ -2,6 +2,7 @@ package kitchen
 
 import (
 	"net/http"
+	"sync"
 
 	"golang.org/x/net/context"
 )
@@ -29,18 +30,15 @@ type ResponseWriter interface {
 // Create new response writer base on http response writer interface
 // TODO : do i need to implement hijacker and flusher interface?
 func NewResponseWriter(rw http.ResponseWriter, ctx context.Context) ResponseWriter {
-	return &responseWriter{rw, ctx, 0, 0}
+	return &responseWriter{rw, ctx, sync.RWMutex{}, 0, 0}
 }
 
 type responseWriter struct {
 	http.ResponseWriter
 	context.Context
+	sync.RWMutex
 	status int
 	size   int
-}
-
-func (rw responseWriter) Header() http.Header {
-	return rw.ResponseWriter.Header()
 }
 
 func (rw *responseWriter) Write(d []byte) (int, error) {
@@ -78,7 +76,9 @@ func (rw *responseWriter) Status() int {
 }
 
 func (rw *responseWriter) SetContext(ctx context.Context) {
+	rw.Lock()
 	rw.Context = ctx
+	rw.Unlock()
 }
 
 func (rw *responseWriter) Flush() {
