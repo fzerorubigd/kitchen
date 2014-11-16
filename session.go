@@ -34,7 +34,7 @@ func SessionMiddleware(sess sessions.Store) MiddlewareFunc {
 // Get session from context. make sure the SessionMiddleware is there and you call this
 // after session middleware in chain
 func GetSession(w http.ResponseWriter, r *http.Request) (sessions.Store, error) {
-	ctx, ok := w.(Context)
+	ctx, ok := w.(context.Context)
 	if !ok {
 		return nil, errors.New("the Context interface is not implemented")
 	}
