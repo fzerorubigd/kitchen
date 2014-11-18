@@ -24,9 +24,13 @@ func NewMiddlewareChain(f ...MiddlewareFunc) MiddlewareChain {
 }
 
 // A simple hack middleware to change the ResponseWriter type
+// The context trigger Context cancel function t
 func responseWriterWrap(next http.Handler) http.Handler {
 	fn := func(rw http.ResponseWriter, r *http.Request) {
-		ctx := context.TODO() // :)
+		// Add support for cancel. when this middleware is done, the request is dead.
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
 		next.ServeHTTP(NewResponseWriter(rw, ctx), r)
 	}
 

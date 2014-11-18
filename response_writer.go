@@ -7,6 +7,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+type key string
+
 // ResponseWriter is much like negroni ResponseWriter interface.
 // But it also support context, using google context package, you can change the context,
 // normally with a child context with old context as its parent
@@ -15,28 +17,28 @@ type ResponseWriter interface {
 	http.ResponseWriter
 	// Flusher interface
 	http.Flusher
-	// This is also Context support
-	context.Context
 	//The status code set by the client
 	Status() int
 	// How many byte written into this writer
 	Size() int
 	// Is the output is written already or not?
 	Written() bool
-	// Replace context, need to think more :)
+	// Replace context
 	SetContext(context.Context)
+	// Get the current context
+	Context() context.Context
 }
 
 // NewResponseWriter Create new response writer base on http response writer interface
 // TODO : do i need to implement hijacker and flusher interface?
 func NewResponseWriter(rw http.ResponseWriter, ctx context.Context) ResponseWriter {
-	return &responseWriter{rw, ctx, sync.RWMutex{}, 0, 0}
+	return &responseWriter{rw, &sync.RWMutex{}, ctx, 0, 0}
 }
 
 type responseWriter struct {
 	http.ResponseWriter
-	context.Context
-	sync.RWMutex
+	*sync.RWMutex
+	ctx    context.Context
 	status int
 	size   int
 }
@@ -77,8 +79,16 @@ func (rw *responseWriter) Status() int {
 
 func (rw *responseWriter) SetContext(ctx context.Context) {
 	rw.Lock()
-	rw.Context = ctx
-	rw.Unlock()
+	defer rw.Unlock()
+
+	rw.ctx = ctx
+}
+
+func (rw *responseWriter) Context() context.Context {
+	rw.RLock()
+	defer rw.RUnlock()
+
+	return rw.ctx // Is this correct to use this kind of lock here?
 }
 
 func (rw *responseWriter) Flush() {
