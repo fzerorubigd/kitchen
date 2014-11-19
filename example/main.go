@@ -49,8 +49,8 @@ func test(w http.ResponseWriter, r *http.Request) {
 	} else {
 		logrus.Panic(err)
 	}
-	d := w.(kitchen.ResponseWriter).Context().Done()
-	<-d
+	//d := w.(kitchen.ResponseWriter).Context().Done()
+	//<-d
 	fmt.Fprintf(w, ":)")
 }
 

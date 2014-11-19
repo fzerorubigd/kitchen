@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-// StaticMiddleware create a static middleware function for serve the file from a folder
+// StaticMiddlewareGenerator create a static middleware function for serve the file from a folder
 // This part is base on negroni static handler
-func StaticMiddleware(dir http.FileSystem, prefix, index string) MiddlewareFunc {
+func StaticMiddlewareGenerator(dir http.FileSystem, prefix, index string) MiddlewareFunc {
 	fn := func(next http.Handler) http.Handler {
 		fn := func(rw http.ResponseWriter, r *http.Request) {
 			if r.Method != "GET" && r.Method != "HEAD" {

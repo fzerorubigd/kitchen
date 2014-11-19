@@ -17,19 +17,23 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 			"remote":  r.RemoteAddr,
 		}).Info("started handling request")
 
-		next.ServeHTTP(w, r) // Call the next one
+		go func() {
+			res := w.(ResponseWriter)
+			<-res.Context().Done()
+			latency := time.Since(start)
+			logrus.WithFields(logrus.Fields{
+				"status":          res.Status(),
+				"method":          r.Method,
+				"request":         r.RequestURI,
+				"remote":          r.RemoteAddr,
+				"text_status":     http.StatusText(res.Status()),
+				"took":            latency,
+				"measure_latency": latency.Nanoseconds(),
+				"cancel_error":    res.Context().Err(),
+			}).Info("completed handling request")
+		}()
 
-		latency := time.Since(start)
-		res := w.(ResponseWriter)
-		logrus.WithFields(logrus.Fields{
-			"status":          res.Status(),
-			"method":          r.Method,
-			"request":         r.RequestURI,
-			"remote":          r.RemoteAddr,
-			"text_status":     http.StatusText(res.Status()),
-			"took":            latency,
-			"measure latency": latency.Nanoseconds(),
-		}).Info("completed handling request")
+		next.ServeHTTP(w, r) // Call the next one
 	}
 	return http.HandlerFunc(fn)
 }
