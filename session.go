@@ -10,7 +10,7 @@ import (
 )
 
 // SessionContextKey is the key for session store in Context
-const SessionContextKey key = "session"
+const SessionContextKey key = 0
 
 // SessionMiddleware create new session midleware.
 // TODO : is this idiomatic :) to have 3 nested function like this?

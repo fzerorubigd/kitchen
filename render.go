@@ -9,7 +9,7 @@ import (
 )
 
 // RenderContextKey is the key used to store render inside the context
-const RenderContextKey key = "render"
+const RenderContextKey key = 1
 
 // RenderMiddlewareGenerator generate a new render middleware for use in kitchen using render package
 // Personally I hate when the framework automatically render a template base on its name. so its

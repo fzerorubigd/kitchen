@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-type key string
+type key int
 
 // ResponseWriter is much like negroni ResponseWriter interface.
 // But it also support context, using google context package, you can change the context,
