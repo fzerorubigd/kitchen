@@ -27,8 +27,7 @@ func (s *session) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.next.ServeHTTP(w, r)
 }
 
-// SessionMiddleware create new session midleware.
-// TODO : is this idiomatic :) to have 3 nested function like this?
+// SessionMiddlewareGenerator to create new session midleware.
 func SessionMiddlewareGenerator(sess sessions.Store) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return &session{next, sess}
