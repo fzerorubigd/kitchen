@@ -44,7 +44,8 @@ type responseWriter struct {
 }
 
 func (rw *responseWriter) Write(d []byte) (int, error) {
-	if !rw.Written() {
+	// Write header if its not already written
+	if !rw.Written() && rw.status == 0 {
 		rw.WriteHeader(http.StatusOK)
 	}
 
