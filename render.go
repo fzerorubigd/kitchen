@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/unrolled/render"
-	"golang.org/x/net/context"
 )
 
 // RenderContextKey is the key used to store render inside the context
@@ -19,7 +18,7 @@ type rndr struct {
 func (rn *rndr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Do not call panic, here. I think its ok to just ignore this requests
 	if ctx, ok := w.(ResponseWriter); ok {
-		ctx.SetContext(context.WithValue(ctx.Context(), RenderContextKey, rn.rndr))
+		ctx.SetWithValue(RenderContextKey, rn.rndr)
 	}
 	rn.next.ServeHTTP(w, r)
 }

@@ -3,6 +3,7 @@ package kitchen
 import (
 	"net/http"
 	"sync"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -23,10 +24,14 @@ type ResponseWriter interface {
 	Size() int
 	// Is the output is written already or not?
 	Written() bool
-	// Replace context
-	SetContext(context.Context)
 	// Get the current context
 	Context() context.Context
+	// Set the context with a value
+	SetWithValue(key interface{}, value interface{})
+	// Set the context with timeout
+	SetWithTimeout(time.Duration) context.CancelFunc
+	// Set the context with deadline
+	SetWithDeadline(time.Time) context.CancelFunc
 }
 
 // NewResponseWriter Create new response writer base on http response writer interface
@@ -78,18 +83,39 @@ func (rw *responseWriter) Status() int {
 	return rw.status
 }
 
-func (rw *responseWriter) SetContext(ctx context.Context) {
-	rw.Lock()
-	defer rw.Unlock()
-
-	rw.ctx = ctx
-}
-
 func (rw *responseWriter) Context() context.Context {
 	rw.RLock()
 	defer rw.RUnlock()
 
 	return rw.ctx // Is this correct to use this kind of lock here?
+}
+
+func (rw *responseWriter) SetWithValue(key interface{}, value interface{}) {
+	rw.Lock()
+	defer rw.Unlock()
+
+	rw.ctx = context.WithValue(rw.ctx, key, value)
+}
+
+func (rw *responseWriter) SetWithTimeout(d time.Duration) context.CancelFunc {
+	rw.Lock()
+	defer rw.Unlock()
+
+	var res context.CancelFunc
+	rw.ctx, res = context.WithTimeout(rw.ctx, d)
+
+	return res
+}
+
+func (rw *responseWriter) SetWithDeadline(t time.Time) context.CancelFunc {
+	rw.Lock()
+	defer rw.Unlock()
+
+	var res context.CancelFunc
+	rw.ctx, res = context.WithDeadline(rw.ctx, t)
+
+	return res
+
 }
 
 func (rw *responseWriter) Flush() {

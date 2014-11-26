@@ -6,7 +6,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
-	"golang.org/x/net/context"
 )
 
 // SessionContextKey is the key for session store in Context
@@ -23,7 +22,7 @@ func (s *session) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		logrus.Panic("only usable inside kitchen")
 	}
 
-	ctx.SetContext(context.WithValue(ctx.Context(), SessionContextKey, s.sess))
+	ctx.SetWithValue(SessionContextKey, s.sess)
 	s.next.ServeHTTP(w, r)
 }
 
