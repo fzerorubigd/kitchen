@@ -8,8 +8,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-type key int
-
 // ResponseWriter is much like negroni ResponseWriter interface.
 // But it also support context, using google context package,
 // the context is readonly and can extend it with SetWith* functions
