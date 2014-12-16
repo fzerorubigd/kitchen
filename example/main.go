@@ -8,6 +8,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/fzerorubigd/kitchen"
+	"github.com/fzerorubigd/kitchen/middlewares"
 	"github.com/gorilla/sessions"
 	"golang.org/x/net/context"
 )
@@ -31,7 +32,7 @@ func test(w http.ResponseWriter, r *http.Request) {
 		fmt.Print("Im done!")
 	}()
 
-	if store, err := kitchen.GetSessionStore(w); err == nil {
+	if store, err := middlewares.GetSessionStore(w); err == nil {
 		if sess, err := store.Get(r, "test-store"); err == nil {
 
 			if x, ok := sess.Values["data"]; ok {
@@ -59,10 +60,10 @@ func main() {
 	http.Handle(
 		"/",
 		kitchen.NewChain(
-			kitchen.RecoveryMiddleware,
-			kitchen.TimeoutMiddlewareGenerator(time.Second*10),
-			kitchen.LoggerMiddleware,
-			kitchen.SessionMiddlewareGenerator(store),
+			middlewares.RecoveryMiddleware,
+			middlewares.TimeoutMiddlewareGenerator(time.Second*10),
+			middlewares.LoggerMiddleware,
+			middlewares.SessionMiddlewareGenerator(store),
 		).ThenFunc(test),
 	)
 

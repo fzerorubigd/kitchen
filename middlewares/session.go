@@ -37,7 +37,7 @@ func SessionMiddlewareGenerator(sess sessions.Store) kitchen.Middleware {
 // GetSessionStore is for get session from context. make sure the SessionMiddleware is there and you call this
 // after session middleware in chain
 func GetSessionStore(w http.ResponseWriter) (sessions.Store, error) {
-	if ctx, ok := w.(ResponseWriter); ok {
+	if ctx, ok := w.(kitchen.ResponseWriter); ok {
 		if s, ok := ctx.Context().Value(SessionContextKey).(sessions.Store); ok {
 			return s, nil
 		}
