@@ -1,9 +1,10 @@
-package kitchen
+package middlewares
 
 import (
 	"errors"
 	"net/http"
 
+	"github.com/fzerorubigd/kitchen"
 	"github.com/unrolled/render"
 )
 
@@ -17,7 +18,7 @@ type rndr struct {
 
 func (rn *rndr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Do not call panic, here. I think its ok to just ignore this requests
-	if ctx, ok := w.(ResponseWriter); ok {
+	if ctx, ok := w.(kitchen.ResponseWriter); ok {
 		ctx.SetWithValue(RenderContextKey, rn.rndr)
 	}
 	rn.next.ServeHTTP(w, r)
@@ -26,7 +27,7 @@ func (rn *rndr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // RenderMiddlewareGenerator generate a new render middleware for use in kitchen using render package
 // Personally I hate when the framework automatically render a template base on its name. so its
 // not an option here.
-func RenderMiddlewareGenerator(rn *render.Render) Middleware {
+func RenderMiddlewareGenerator(rn *render.Render) kitchen.Middleware {
 	return func(next http.Handler) http.Handler {
 		return &rndr{next, rn}
 	}
@@ -35,7 +36,7 @@ func RenderMiddlewareGenerator(rn *render.Render) Middleware {
 // GetRender is a helper function and returns the render object.
 // Reterns error in case of wrong interface or when the middleware is not used on the request.
 func GetRender(w http.ResponseWriter) (*render.Render, error) {
-	if ctx, ok := w.(ResponseWriter); ok {
+	if ctx, ok := w.(kitchen.ResponseWriter); ok {
 		if r, ok := ctx.Context().Value(RenderContextKey).(*render.Render); ok {
 			return r, nil
 		}

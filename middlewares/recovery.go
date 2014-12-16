@@ -1,4 +1,4 @@
-package kitchen
+package middlewares
 
 import (
 	"net/http"

@@ -1,10 +1,11 @@
-package kitchen
+package middlewares
 
 import (
 	"net/http"
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/fzerorubigd/kitchen"
 )
 
 type logger struct {
@@ -20,7 +21,7 @@ func (l *logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}).Info("started handling request")
 
 	go func() {
-		res := w.(ResponseWriter)
+		res := w.(kitchen.ResponseWriter)
 		<-res.Context().Done()
 		latency := time.Since(start)
 		logrus.WithFields(logrus.Fields{

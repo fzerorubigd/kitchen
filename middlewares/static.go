@@ -1,9 +1,11 @@
-package kitchen
+package middlewares
 
 import (
 	"net/http"
 	"path"
 	"strings"
+
+	"github.com/fzerorubigd/kitchen"
 )
 
 type static struct {
@@ -68,7 +70,7 @@ func (s *static) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 // StaticMiddlewareGenerator create a static middleware function for serve the file from a folder
 // This part is base on negroni static handler
-func StaticMiddlewareGenerator(dir http.FileSystem, prefix, index string) Middleware {
+func StaticMiddlewareGenerator(dir http.FileSystem, prefix, index string) kitchen.Middleware {
 	fn := func(next http.Handler) http.Handler {
 		return &static{next, dir, prefix, index}
 	}

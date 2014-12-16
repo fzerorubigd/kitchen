@@ -1,10 +1,11 @@
-package kitchen
+package middlewares
 
 import (
 	"errors"
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/fzerorubigd/kitchen"
 	"github.com/gorilla/sessions"
 )
 
@@ -17,7 +18,7 @@ type session struct {
 }
 
 func (s *session) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, ok := w.(ResponseWriter)
+	ctx, ok := w.(kitchen.ResponseWriter)
 	if !ok {
 		logrus.Panic("only usable inside kitchen")
 	}
@@ -27,7 +28,7 @@ func (s *session) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // SessionMiddlewareGenerator to create new session midleware.
-func SessionMiddlewareGenerator(sess sessions.Store) Middleware {
+func SessionMiddlewareGenerator(sess sessions.Store) kitchen.Middleware {
 	return func(next http.Handler) http.Handler {
 		return &session{next, sess}
 	}
