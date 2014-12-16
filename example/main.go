@@ -58,7 +58,7 @@ func main() {
 	store := sessions.NewCookieStore([]byte("something...."))
 	http.Handle(
 		"/",
-		kitchen.NewMiddlewareChain(
+		kitchen.NewChain(
 			kitchen.RecoveryMiddleware,
 			kitchen.TimeoutMiddlewareGenerator(time.Second*10),
 			kitchen.LoggerMiddleware,

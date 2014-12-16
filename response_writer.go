@@ -11,8 +11,8 @@ import (
 type key int
 
 // ResponseWriter is much like negroni ResponseWriter interface.
-// But it also support context, using google context package, you can change the context,
-// normally with a child context with old context as its parent
+// But it also support context, using google context package,
+// the context is readonly and can extend it with SetWith* functions
 type ResponseWriter interface {
 	// The original response writer
 	http.ResponseWriter
@@ -115,7 +115,6 @@ func (rw *responseWriter) SetWithDeadline(t time.Time) context.CancelFunc {
 	rw.ctx, res = context.WithDeadline(rw.ctx, t)
 
 	return res
-
 }
 
 func (rw *responseWriter) Flush() {

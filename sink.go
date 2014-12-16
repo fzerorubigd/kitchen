@@ -6,25 +6,25 @@ import (
 	"golang.org/x/net/context"
 )
 
-// MiddlewareFunc type, middlewares are like this
-type MiddlewareFunc func(http.Handler) http.Handler
+// Middleware is the call back used for middlewares
+type Middleware func(http.Handler) http.Handler
 
-// MiddlewareChain structure for handling middleware
+// Chain structure for handling middleware
 // This is base on alice. I think alice is good but
 // whitout call(next(next(next))), I think this is not a good thing
 // to have this kind of chain. also the ResponseWriter need more extra
 // Data to handle
-type MiddlewareChain struct {
-	functions []MiddlewareFunc
+type Chain struct {
+	functions []Middleware
 }
 
-// NewMiddlewareChain create new middleware base on functions
-func NewMiddlewareChain(f ...MiddlewareFunc) MiddlewareChain {
-	return MiddlewareChain{f}
+// NewChain create new middleware chain base on provided middlewares function
+func NewChain(f ...Middleware) Chain {
+	return Chain{f}
 }
 
 // A simple hack middleware to change the ResponseWriter type
-// The context trigger Context cancel function t
+// The context trigger Context cancel function after request is finished.
 func responseWriterWrap(next http.Handler) http.Handler {
 	fn := func(rw http.ResponseWriter, r *http.Request) {
 		// Add support for cancel. when this middleware is done, the request is dead.
@@ -38,7 +38,7 @@ func responseWriterWrap(next http.Handler) http.Handler {
 }
 
 // Then Create the real http handler function.
-func (mc MiddlewareChain) Then(h http.Handler) http.Handler {
+func (mc Chain) Then(h http.Handler) http.Handler {
 	var final http.Handler
 	if h != nil {
 		final = h
@@ -53,7 +53,7 @@ func (mc MiddlewareChain) Then(h http.Handler) http.Handler {
 }
 
 // ThenFunc Create the real http handler function.
-func (mc MiddlewareChain) ThenFunc(fn http.HandlerFunc) http.Handler {
+func (mc Chain) ThenFunc(fn http.HandlerFunc) http.Handler {
 	if fn == nil {
 		return mc.Then(nil)
 	}
@@ -63,11 +63,11 @@ func (mc MiddlewareChain) ThenFunc(fn http.HandlerFunc) http.Handler {
 
 // Extend Append function to middleware chain and return NEW chain object
 // The old chain is usable after this.
-func (mc MiddlewareChain) Extend(f ...MiddlewareFunc) MiddlewareChain {
-	newFuncs := make([]MiddlewareFunc, len(mc.functions))
+func (mc Chain) Extend(f ...Middleware) Chain {
+	newFuncs := make([]Middleware, len(mc.functions))
 	copy(newFuncs, mc.functions)
 	newFuncs = append(newFuncs, f...)
 
-	newChain := NewMiddlewareChain(newFuncs...)
+	newChain := NewChain(newFuncs...)
 	return newChain
 }

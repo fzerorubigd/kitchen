@@ -68,7 +68,7 @@ func (s *static) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 // StaticMiddlewareGenerator create a static middleware function for serve the file from a folder
 // This part is base on negroni static handler
-func StaticMiddlewareGenerator(dir http.FileSystem, prefix, index string) MiddlewareFunc {
+func StaticMiddlewareGenerator(dir http.FileSystem, prefix, index string) Middleware {
 	fn := func(next http.Handler) http.Handler {
 		return &static{next, dir, prefix, index}
 	}

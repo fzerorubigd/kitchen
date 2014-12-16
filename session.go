@@ -27,7 +27,7 @@ func (s *session) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // SessionMiddlewareGenerator to create new session midleware.
-func SessionMiddlewareGenerator(sess sessions.Store) MiddlewareFunc {
+func SessionMiddlewareGenerator(sess sessions.Store) Middleware {
 	return func(next http.Handler) http.Handler {
 		return &session{next, sess}
 	}

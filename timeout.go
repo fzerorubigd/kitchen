@@ -22,7 +22,7 @@ func (t *timeout) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // TimeoutMiddlewareGenerator generate a middleware for trigger Done channel on context
 // in every request
-func TimeoutMiddlewareGenerator(to time.Duration) MiddlewareFunc {
+func TimeoutMiddlewareGenerator(to time.Duration) Middleware {
 	return func(next http.Handler) http.Handler {
 		return &timeout{next, to}
 	}

@@ -26,7 +26,7 @@ func (rn *rndr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // RenderMiddlewareGenerator generate a new render middleware for use in kitchen using render package
 // Personally I hate when the framework automatically render a template base on its name. so its
 // not an option here.
-func RenderMiddlewareGenerator(rn *render.Render) MiddlewareFunc {
+func RenderMiddlewareGenerator(rn *render.Render) Middleware {
 	return func(next http.Handler) http.Handler {
 		return &rndr{next, rn}
 	}
