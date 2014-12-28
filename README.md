@@ -1,6 +1,7 @@
 # kitchen
 
 [![Build Status](https://travis-ci.org/fzerorubigd/kitchen.svg?branch=master)](https://travis-ci.org/fzerorubigd/kitchen)
+[![Coverage Status](https://coveralls.io/repos/fzerorubigd/kitchen/badge.png)](https://coveralls.io/r/fzerorubigd/kitchen)
 
 A very simple bootstrap for my web project, based on [alice](https://github.com/justinas/alice) and [negroni](https://github.com/codegangsta/negroni) and [context]() package.
 
