@@ -1,6 +1,9 @@
 package kitchen
 
 import (
+	"bufio"
+	"errors"
+	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -16,6 +19,8 @@ type ResponseWriter interface {
 	http.ResponseWriter
 	// Flusher interface
 	http.Flusher
+	// Hijacker is used in websocket connections and al upgrade request
+	http.Hijacker
 	//The status code set by the client
 	Status() int
 	// How many byte written into this writer
@@ -120,4 +125,13 @@ func (rw *responseWriter) Flush() {
 	if ok {
 		flusher.Flush()
 	}
+}
+
+func (rw *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	hijacker, ok := rw.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("hijacker is not implemented")
+	}
+
+	return hijacker.Hijack()
 }
